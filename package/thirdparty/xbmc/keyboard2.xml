@@ -1,0 +1,29 @@
+<keymap>
+  <global>
+    <keyboard>
+      <n>XBMC.ActivateWindow(MyMusic)</n>
+      <a>XBMC.ActivateWindow(Settings)</a>
+      <y>XBMC.RunScript(script.globalsearch)</y>
+      <f1>XBMC.ActivateWindow(MyPictures)</f1>
+      <f9>XBMC.ActivateWindow(accesspoints)</f9>
+      <f10>XBMC.ActivateWindow(MyFiles)</f10>
+      <o>Info</o>
+      <delete>Back</delete>
+    </keyboard>
+  </global>
+  <Home>
+     <keyboard>
+        <o>XBMC.updatelibrary(Video)</o>
+     </keyboard>
+  </Home>
+  <FullscreenVideo>
+    <keyboard>
+      	<f>StepForward</f>   
+	<r>StepBack</r>   
+	<period>BigStepForward</period>
+	<comma>BigStepBack</comma>  
+	<g>AudioNextLanguage</g>
+        <o>Info</o>
+    </keyboard>
+  </FullscreenVideo>
+</keymap>

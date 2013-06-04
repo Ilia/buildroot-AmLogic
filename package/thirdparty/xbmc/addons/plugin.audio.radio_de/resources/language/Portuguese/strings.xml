@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!-- Translated using Transifex web application. For support, or if you would like to to help out, please visit your language team! -->
+<!-- Portuguese language-Team URL: http://www.transifex.com/projects/p/xbmc-addons/language/pt/ -->
+<!-- Report language file syntax bugs at: alanwww1@xbmc.org -->
+
+<strings>
+    <string id="30102">Procurar por género</string>
+    <string id="30104">Navegar por país</string>
+
+    <!-- Settings -->
+    <string id="30300">Lingua</string>
+    <string id="30301">Inglês</string>
+    <string id="30302">Alemão</string>
+    <string id="30303">Francês</string>
+    <string id="30310">Forçar Vista para Miniatura</string>
+
+    <!-- Error Message -->
+    <string id="30600">Erro de Rede</string>
+</strings>
