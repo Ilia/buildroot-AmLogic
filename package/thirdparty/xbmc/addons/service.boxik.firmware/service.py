@@ -13,8 +13,8 @@ class Main:
             pass
             #TODO: NOT WORKING CURRENTLY
             import xbmc
-            xbmc.executebuiltin('XBMC.AlarmClock(BOXiKCheckAtBoot,XBMC.RunScript(service.boxik.firmware, auto),00:00:10,silent)')
-            xbmc.executebuiltin('XBMC.AlarmClock(BOXiKCheckWhileRunning,XBMC.RunScript(service.boxik.firmware, auto),04:00:00,silent,loop)')
+            #xbmc.executebuiltin('XBMC.AlarmClock(BOXiKCheckAtBoot,XBMC.RunScript(service.boxik.firmware, auto),00:00:10,silent)')
+            #xbmc.executebuiltin('XBMC.AlarmClock(BOXiKCheckWhileRunning,XBMC.RunScript(service.boxik.firmware, auto),04:00:00,silent,loop)')
         else:
             try:
                 if sys.argv[1] == 'auto':
