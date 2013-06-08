@@ -4,9 +4,9 @@
 #
 #################################################################################
 
-XBMC_VERSION = 91f7a05505bab765d799dd0c3e4eef6422f8f910
+XBMC_VERSION = dfef3bdb5330dd796d24eeb1b99e49e020cead8f
 XBMC_SITE_METHOD = git
-XBMC_SITE = git://github.com/j1nx/xbmc.git
+XBMC_SITE = git://github.com/Ilia/xbmc.git
 XBMC_INSTALL_STAGING = YES
 XBMC_INSTALL_TARGET = YES
 
@@ -58,6 +58,8 @@ define XBMC_INSTALL_ETC
   cp -f package/thirdparty/xbmc/guisettings.xml $(TARGET_DIR)/usr/share/xbmc/system/
   cp -f package/thirdparty/xbmc/advancedsettings.xml $(TARGET_DIR)/usr/share/xbmc/system/
   cp -f package/thirdparty/xbmc/nobs.xml $(TARGET_DIR)/usr/share/xbmc/system/keymaps/
+  cp -f package/thirdparty/xbmc/keyboard2.xml $(TARGET_DIR)/usr/share/xbmc/system/keymaps/
+  cp -f package/thirdparty/xbmc/peripherals.xml $(TARGET_DIR)/usr/share/xbmc/system/
 endef
 
 define XBMC_INSTALL_REMOTE_CONF
@@ -76,6 +78,21 @@ define XBMC_CLEAN_CONFLUENCE_SKIN
   find $(TARGET_DIR)/usr/share/xbmc/addons/skin.confluence/media -name *.jpg -delete
 endef
 
+define XBMC_INSTALL_SPLASH
+  cp -f package/thirdparty/xbmc/boxik_splash.png $(TARGET_DIR)/usr/share/xbmc/media/Splash.png
+endef
+
+define XBMC_INSTALL_BOXIK_REPO
+   mkdir -p $(TARGET_DIR)/usr/share/xbmc/addons/repository.boxik
+   cp -rf package/thirdparty/xbmc/addons/repository.boxik/* $(TARGET_DIR)/usr/share/xbmc/addons/repository.boxik/
+endef
+
+define XBMC_INSTALL_BOXIK_ADDONS
+   mkdir -p $(TARGET_DIR)/usr/share/xbmc/addons
+   cp -rf package/thirdparty/xbmc/addons/* $(TARGET_DIR)/usr/share/xbmc/addons/
+endef
+
+
 define XBMC_STRIP_BINARIES
   find $(TARGET_DIR)/usr/lib/xbmc/ -name "*.so" -exec $(STRIPCMD) $(STRIP_STRIP_UNNEEDED) {} \;
   $(STRIPCMD) $(STRIP_STRIP_UNNEEDED) $(TARGET_DIR)/usr/lib/xbmc/xbmc.bin
@@ -86,6 +103,9 @@ XBMC_POST_INSTALL_TARGET_HOOKS += XBMC_INSTALL_ETC
 XBMC_POST_INSTALL_TARGET_HOOKS += XBMC_CLEAN_UNUSED_ADDONS
 XBMC_POST_INSTALL_TARGET_HOOKS += XBMC_CLEAN_CONFLUENCE_SKIN
 XBMC_POST_INSTALL_TARGET_HOOKS += XBMC_INSTALL_REMOTE_CONF
+XBMC_POST_INSTALL_TARGET_HOOKS += XBMC_INSTALL_BOXIK_ADDONS
+XBMC_POST_INSTALL_TARGET_HOOKS += XBMC_INSTALL_BOXIK_REPO
+XBMC_POST_INSTALL_TARGET_HOOKS += XBMC_INSTALL_SPLASH
 ifneq ($(BR2_ENABLE_DEBUG),y)
 XBMC_POST_INSTALL_TARGET_HOOKS += XBMC_STRIP_BINARIES
 endif

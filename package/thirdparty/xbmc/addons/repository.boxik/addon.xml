@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="repository.boxik" name="BOXiK Applications" version="0.0.3" provider-name="BOXiK">
+	<extension point="xbmc.addon.repository" name="BOXiK Applications">
+		<info compressed="false">http://www.mogilia.com/xbmc/addons.xml</info>
+		<checksum>http://www.mogilia.com/xbmc/addons.xml.md5</checksum>
+		<datadir zip="true">http://www.mogilia.com/xbmc/</datadir>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary>Install add-ons from the BOXiK Repositories Repository</summary>
+		<description>Download and install add-ons in multiple categories from the BOXiK addon repository.[CR][CR]If you find a broken or not working addon or you would like to include another one, please have a look at http://boxik.tv/[CR][CR]The repository is maintained by BOXiK.</description>
+		<platform>all</platform>
+	</extension>
+</addon>

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 if [ "X$1" = "Xstart" ]; then
+  echo 720p > /sys/class/display/mode
   echo 1 > /sys/class/graphics/fb0/blank
   echo 1 > /sys/class/graphics/fb1/blank
   # clear them
