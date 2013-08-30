@@ -1,4 +1,4 @@
-BOXIK_VERSION = e8ad7929bf42c9e21c3c1a118a0e46af4b3c3e6b
+BOXIK_VERSION = 1.1.15
 BOXIK_SITE_METHOD = git
 BOXIK_SITE = git://github.com/Ilia/skin.boxik.git
 BOXIK_INSTALL_STAGING = YES
