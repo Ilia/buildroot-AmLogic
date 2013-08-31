@@ -18,8 +18,6 @@
   </Home>
   <FullscreenVideo>
     <keyboard>
-      	<f>StepForward</f>   
-	<r>StepBack</r>   
 	<period>BigStepForward</period>
 	<comma>BigStepBack</comma>  
 	<g>AudioNextLanguage</g>
