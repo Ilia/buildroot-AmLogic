@@ -20,7 +20,7 @@ TVH_ENABLED=1
 
 # TVH_USER
 #   if set to "" will run as root
-TVH_USER=""
+TVH_USER="root"
 
 # TVH_GROUP
 #   if set to "" will run as root
@@ -28,7 +28,22 @@ TVH_GROUP=""
 
 # TVH_CONF_DIR
 #   if set to "" will use ~TVH_USER/.hts/tvheadend
-TVH_CONF_DIR="/root/.xbmc/tvheadend"
+TVH_CONF_DIR="/root/.hts/tvheadend"
+
+
+# Make sure .hts folder exists
+  if [ ! -d /root/.hts ] ; then
+    mkdir -p /root/.hts
+  fi
+  if [ ! -d /root/.hts/tvheadend ] ; then
+    mkdir -p /root/.hts/tvheadend
+  fi
+
+  # Check for the Dropbear RSA key
+  if [ ! -f /root/.hts/tvheadend/superuser ] ; then
+    echo -n "creating superuser"
+    echo -e '{ \n"username": "admin", \n"password": "admin" \n }' > ${TVH_CONF_DIR}/superuser
+  fi
 
 # TVH_ADAPTERS
 #   if set to "" will use all available adapters
@@ -53,7 +68,7 @@ TVH_HTSP_PORT=""
 
 # TVH_DELAY
 #   if set startup will be delayed N seconds to allow hardware init
-TVH_DELAY="10"
+TVH_DELAY="2"
 
 ARGS="-f"
 [ -z "$TVH_USER"      ] || ARGS="$ARGS -u $TVH_USER"

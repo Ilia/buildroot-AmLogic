@@ -30,5 +30,6 @@ source "package/thirdparty/xios-skin/Config.in"
 source "package/thirdparty/boxik-skin/Config.in"
 source "package/thirdparty/boblight/Config.in"
 source "package/thirdparty/samba36/Config.in"
+source "package/thirdparty/rtmpdump/Config.in"
 
 endmenu

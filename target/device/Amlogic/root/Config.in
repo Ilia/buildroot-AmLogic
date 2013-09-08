@@ -2,7 +2,7 @@ if (BR2_TARGET_AMLOGIC)
 
 config BR2_TARGET_AMLOGIC_HOSTNAME
        string "System Amlogic"
-       default "buildroot"
+       default "boxik"
        help
          Select system hostname to be stored in /etc/hostname.
 

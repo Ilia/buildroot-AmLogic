@@ -16,7 +16,7 @@ endchoice
 
 config BR2_TARGET_GENERIC_HOSTNAME
        string "System hostname"
-       default "buildroot"
+       default "boxik"
        help
          Select system hostname to be stored in /etc/hostname.
 

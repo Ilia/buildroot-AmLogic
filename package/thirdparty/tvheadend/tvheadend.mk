@@ -25,23 +25,7 @@ else
 TVHEADEND_CONFIGURE_OPTS   += --disable-imagecache
 endif
 
-#----------------------------------------------------------------------------
-# To run tvheadend, we need:
-#  - a startup script
-#  - a default DB with a tvheadend admin
-define TVHEADEND_INSTALL_DB
- $(INSTALL) -D package/thirdparty/tvheadend/accesscontrol.1     \
-               $(TARGET_DIR)/root/.xbmc/tvheadend/accesscontrol/1
+define TVHEADEND_INSTALL_TARGET_CMDS
+	$(INSTALL) -D package/thirdparty/tvheadend/S92tvheadend $(TARGET_DIR)/etc/init.d/S92tvheadend
 endef
-
-define TVHEADEND_INSTALL_INIT_SYSV
- $(INSTALL) -D package/thirdpart/tvheadend/S99tvheadend $(TARGET_DIR)/etc/init.d/S99tvheadend
-endef
-
-TVHEADEND_POST_INSTALL_TARGET_HOOKS  += TVHEADEND_INSTALL_DB
-TVHEADEND_POST_INSTALL_TARGET_HOOKS  += TVHEADEND_INSTALL_INIT_SYSV
-
-#----------------------------------------------------------------------------
-# tvheadend is not an autotools-based package, but it is possible to
-# call its ./configure script as if it were an autotools one.
-$(eval $(autotools-package))
+$(eval $(call AUTOTARGETS,package/thirdparty,tvheadend))
