@@ -1,7 +1,10 @@
 <advancedsettings>
   <enablenetworkmanager>1</enablenetworkmanager>
   <showexitbutton>false</showexitbutton>
-
+  <network>
+    <alwaysforcebuffer>true</alwaysforcebuffer>
+    <readbufferfactor>4</readbufferfactor>
+  </network> 
   <pvr>
     <minvideocachelevel>50</minvideocachelevel>
     <minaudiocachelevel>50</minaudiocachelevel>

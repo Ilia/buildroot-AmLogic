@@ -1,7 +1,7 @@
 <settings>
     <lookandfeel>
         <enablerssfeeds>false</enablerssfeeds>
-    	 <skin>skin.boxik</skin>
+    	<skin>skin.boxik</skin>
     </lookandfeel>
     <audiooutput>
         <guisoundmode>0</guisoundmode>
@@ -37,7 +37,7 @@
         <webserver>true</webserver>
         <webserverpassword></webserverpassword>
         <webserverport>80</webserverport>
-        <webserverusername>xbmc</webserverusername>
+        <webserverusername></webserverusername>
         <webskin>webinterface.default</webskin>
         <zeroconf>true</zeroconf>
     </services>
