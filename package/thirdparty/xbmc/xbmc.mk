@@ -4,7 +4,7 @@
 #
 #################################################################################
 
-XBMC_VERSION = d6719d3b11dd8fd2492d0bb71634227a53a2d10a
+XBMC_VERSION = 7ab01d60b6ea52c2fb3e209cb8470f7c42dd9abb
 XBMC_SITE_METHOD = git
 XBMC_SITE = git://github.com/Ilia/xbmc.git
 XBMC_INSTALL_STAGING = YES
