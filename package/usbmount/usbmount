@@ -1,0 +1,64 @@
+#!/bin/sh
+
+MOUNT_BASE="/media"
+MOUNTOPTS="dirsync,noexec,nodev,noatime,nodiratime"
+FILESYSTEMS=' hfsplus vfat ext2 ext3 ext4 exfat ntfs xfs '
+
+case $1 in
+    "add")
+
+        # Get the device information
+        DEVINFO=$(/sbin/blkid -p $DEVNAME)
+        FSTYPE=$(echo "$DEVINFO" | sed 's/.*[[:blank:]]TYPE="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
+        USAGE=$(echo "$DEVINFO"  | sed 's/.*[[:blank:]]USAGE="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
+        LABEL=$(echo "$DEVINFO"  | sed 's/.*[[:blank:]]LABEL="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
+
+        # Check if USERDATA
+        if [ $LABEL == 'USERDATA' ] ; then
+            logger info "mount of $DEVNAME aborted due to LABEL == USERDATA"
+            exit 1
+        fi
+
+        # Check if it's already mounted
+        if [ "`grep "^$DEVNAME" /proc/mounts`" != "" ]; then
+            logger info "$DEVNAME already mounted"
+            exit 1
+        fi
+
+        # Check if it's actually a block device containing a filesystem
+        if ! echo $USAGE | egrep -q "(filesystem|disklabel)"; then
+            logger info "$DEVNAME does not contain a filesystem or disklabel"
+            exit 1
+        fi
+
+        # Check if it has a valid filesystem
+        if [ "`echo $FILESYSTEMS | grep " ${FSTYPE} "`" = "" ]; then
+            logger info "$DEVNAME contains an unsuported filesystem: [${FSTYPE}]"
+            exit 1
+        fi
+
+        # If it has no label, use the device name as mountpoint
+        if [ -z "${LABEL}" ]; then
+            logger info "$DEVNAME has no label, using the device name as mountpoint"
+            LABEL=`basename ${DEVNAME}`
+        fi
+
+        # Create the mountpoint and mount the device in that location
+        mkdir -p ${MOUNT_BASE}/${LABEL}
+        logger info "executing command: mount -t${FSTYPE} "$DEVNAME" ${MOUNT_BASE}/${LABEL}"
+        mount -t${FSTYPE} -o${MOUNTOPTS} "$DEVNAME" ${MOUNT_BASE}/${LABEL}
+
+    ;;
+    "remove")
+
+        # If it is mounted, umount it
+        if [ "`grep "^$DEVNAME ${MOUNT_BASE}/" /proc/mounts`" != "" ]; then
+            logger info "executing command: umount -l ${MOUNT_BASE}/${LABEL}"
+            umount -l ${MOUNT_BASE}/${LABEL}
+        fi
+
+    ;;
+    *)
+        logger err "Wrong option [$1]"
+    ;;
+esac
