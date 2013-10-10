@@ -2,16 +2,15 @@
 
 MOUNT_BASE="/media"
 MOUNTOPTS="dirsync,noexec,nodev,noatime,nodiratime"
-FILESYSTEMS=' hfsplus vfat ext2 ext3 ext4 exfat ntfs xfs '
+FILESYSTEMS=' hfsplus vfat ext2 ext3 ext4 exfat ntfs hfsplus xfs '
+
+DEVINFO=$(/sbin/blkid -p $DEVNAME)
+FSTYPE=$(echo "$DEVINFO" | sed 's/.*[[:blank:]]TYPE="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
+USAGE=$(echo "$DEVINFO"  | sed 's/.*[[:blank:]]USAGE="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
+LABEL=$(echo "$DEVINFO"  | sed 's/.*[[:blank:]]LABEL="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
 
 case $1 in
     "add")
-
-        # Get the device information
-        DEVINFO=$(/sbin/blkid -p $DEVNAME)
-        FSTYPE=$(echo "$DEVINFO" | sed 's/.*[[:blank:]]TYPE="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
-        USAGE=$(echo "$DEVINFO"  | sed 's/.*[[:blank:]]USAGE="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
-        LABEL=$(echo "$DEVINFO"  | sed 's/.*[[:blank:]]LABEL="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
 
         # Check if USERDATA
         if [ $LABEL == 'USERDATA' ] ; then
@@ -50,9 +49,8 @@ case $1 in
 
     ;;
     "remove")
-
         # If it is mounted, umount it
-        if [ "`grep "^$DEVNAME ${MOUNT_BASE}/" /proc/mounts`" != "" ]; then
+        if [ "`grep "^$DEVNAME ${MOUNT_BASE}/${LABEL}" /proc/mounts`" != "" ]; then
             logger info "executing command: umount -l ${MOUNT_BASE}/${LABEL}"
             umount -l ${MOUNT_BASE}/${LABEL}
         fi
