@@ -9,6 +9,8 @@ FSTYPE=$(echo "$DEVINFO" | sed 's/.*[[:blank:]]TYPE="\([^"]*\)".*/\1/g; s/[[:bla
 USAGE=$(echo "$DEVINFO"  | sed 's/.*[[:blank:]]USAGE="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
 LABEL=$(echo "$DEVINFO"  | sed 's/.*[[:blank:]]LABEL="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
 
+logger info "working with $LABEL for $DEVNAME"
+
 case $1 in
     "add")
 
@@ -49,11 +51,24 @@ case $1 in
 
     ;;
     "remove")
+
+	if [ -z "${LABEL}" ]; then
+            logger info "$DEVNAME has no label, using the device name as mountpoint"
+            LABEL=`basename ${DEVNAME}`
+        fi
+	
+	if [ -z "${LABEL}" ]; then
+	    logger info "$DEVNAME has no label still"
+	    exit 1
+	fi
+
         # If it is mounted, umount it
         if [ "`grep "^$DEVNAME ${MOUNT_BASE}/${LABEL}" /proc/mounts`" != "" ]; then
             logger info "executing command: umount -l ${MOUNT_BASE}/${LABEL}"
             umount -l ${MOUNT_BASE}/${LABEL}
-        fi
+            logger info "executing command: rmdir ${MOUNT_BASE}/${LABEL}"
+ 	    rmdir ${MOUNT_BASE}/${LABEL}/
+	fi
 
     ;;
     *)
