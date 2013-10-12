@@ -1,77 +1,84 @@
 #!/bin/sh
 
+if [ -z "$DEVNAME" ]; then
+   logger info  "error: usbmount requires a DEVNAME ie: /dev/sda1 " 
+   exit 1
+fi
+
 MOUNT_BASE="/media"
 MOUNTOPTS="dirsync,noexec,nodev,noatime,nodiratime"
 FILESYSTEMS=' hfsplus vfat ext2 ext3 ext4 exfat ntfs hfsplus xfs '
 
-DEVINFO=$(/sbin/blkid -p $DEVNAME)
-FSTYPE=$(echo "$DEVINFO" | sed 's/.*[[:blank:]]TYPE="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
-USAGE=$(echo "$DEVINFO"  | sed 's/.*[[:blank:]]USAGE="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
-LABEL=$(echo "$DEVINFO"  | sed 's/.*[[:blank:]]LABEL="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
+#DEVINFO=$(/sbin/blkid -o udev -p $DEVNAME)
+#FSTYPE=$(echo "$DEVINFO" | sed 's/.*[[:blank:]]TYPE="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
+#USAGE=$(echo "$DEVINFO"  | sed 's/.*[[:blank:]]USAGE="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
+#LABEL=$(echo "$DEVINFO"  | sed 's/.*[[:blank:]]LABEL="\([^"]*\)".*/\1/g; s/[[:blank:]]*//g;')
 
-# BUG: on boot no label is present - investigate why
+eval `/sbin/blkid -o udev -p ${DEVNAME} | sed 's/^/export /; s/=/="/; s/$/"/'`
 
-logger info "working with $LABEL for $DEVNAME"
+if [ -z "$ID_FS_LABEL" ] || [ -z "$ID_FS_TYPE" ]; then
+    logger info "error: ID_FS_LABEL is empty! did vol_id break? tried $DEVNAME"
+    exit 1
+fi
 
 case $1 in
     "add")
-
+	
+	device_is_mounted=`grep ${DEVNAME} /etc/mtab`
+	if [ -n "$device_is_mounted" ]; then
+	   logger info  "error: seems ${DEVNAME} is already mounted"
+	   exit 1
+	fi
+	
         # Check if USERDATA
-        if [ $LABEL == 'USERDATA' ] ; then
+        if [ $ID_FS_LABEL == 'USERDATA' ] ; then
             logger info "mount of $DEVNAME aborted due to LABEL == USERDATA"
             exit 1
         fi
 
-        # Check if it's already mounted
-        if [ "`grep "^$DEVNAME" /proc/mounts`" != "" ]; then
-            logger info "$DEVNAME already mounted"
-            exit 1
-        fi
-
         # Check if it's actually a block device containing a filesystem
-        if ! echo $USAGE | egrep -q "(filesystem|disklabel)"; then
+        if ! echo $ID_FS_USAGE | egrep -q "(filesystem|disklabel)"; then
             logger info "$DEVNAME does not contain a filesystem or disklabel"
             exit 1
         fi
-
+	
+	if [ ! -e "${MOUNT_BASE}/${ID_FS_LABEL}" ]; then
+	    logger info "creating dir /media/${ID_FS_LABEL}"
+	    mkdir "${MOUNT_BASE}/${ID_FS_LABEL}"
+	fi
+	      
         # Check if it has a valid filesystem
-        if [ "`echo $FILESYSTEMS | grep " ${FSTYPE} "`" = "" ]; then
+        if [ "`echo $FILESYSTEMS | grep " ${ID_FS_TYPE} "`" = "" ]; then
             logger info "$DEVNAME contains an unsuported filesystem: [${FSTYPE}]"
             exit 1
         fi
 
         # If it has no label, use the device name as mountpoint
-        if [ -z "${LABEL}" ]; then
+        if [ -z "${ID_FS_LABEL}" ]; then
             logger info "$DEVNAME has no label, using the device name as mountpoint"
             LABEL=`basename ${DEVNAME}`
         fi
 
         # Create the mountpoint and mount the device in that location
-        mkdir -p ${MOUNT_BASE}/${LABEL}
-        logger info "executing command: mount -t${FSTYPE} "$DEVNAME" ${MOUNT_BASE}/${LABEL}"
-        mount -t${FSTYPE} -o${MOUNTOPTS} "$DEVNAME" ${MOUNT_BASE}/${LABEL}
+        logger info "executing command: mount -t${FSTYPE} "$DEVNAME" ${MOUNT_BASE}/${ID_FS_LABEL}"
+        mount -t${ID_FS_TYPE} -o${MOUNTOPTS} "$DEVNAME" ${MOUNT_BASE}/${ID_FS_LABEL}
 
     ;;
     "remove")
 
-	if [ -z "${LABEL}" ]; then
-            logger info "$DEVNAME has no label, using the device name as mountpoint"
-            LABEL=`basename ${DEVNAME}`
-        fi
-	
-	if [ -z "${LABEL}" ]; then
-	    logger info "$DEVNAME has no label still"
+	MOUNTPT=`mount | grep ${DEVNAME} | cut -d ' ' -f 3`
+	if [ -n "$device_is_mounted" ]; then
+	   logger info "error: the device is not mounted"
+	   exit 1
+	fi
+	      
+	# test mountpoint - it should exist
+	if [ -e "${MOUNTPT}" ]; then
+	    logger info "unmouting ${MOUNTPT}"
+	    umount -l "${MOUNTPT}" && rmdir "${MOUNTPT}" && exit 0
+	    logger info "error: ${MOUNTPT} failed to unmount."
 	    exit 1
 	fi
-
-        # If it is mounted, umount it
-        if [ "`grep "^$DEVNAME ${MOUNT_BASE}/${LABEL}" /proc/mounts`" != "" ]; then
-            logger info "executing command: umount -l ${MOUNT_BASE}/${LABEL}"
-            umount -l ${MOUNT_BASE}/${LABEL}
-            logger info "executing command: rmdir ${MOUNT_BASE}/${LABEL}"
- 	    rmdir ${MOUNT_BASE}/${LABEL}/
-	fi
-
     ;;
     *)
         logger err "Wrong option [$1]"
