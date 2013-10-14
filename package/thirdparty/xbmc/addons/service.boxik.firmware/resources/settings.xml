@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-  <!-- General -->
-  <category label="90101">
-		<setting id="port" type="ipaddress" label="90111" default="127.0.0.1" />    
-    <setting id="ip" type="number" label="90112" default="80" />
-		    <setting type="sep" />
-    <setting id="username" type="text" label="90113" default="" />
-    <setting id="password" type="text" label="90114" default="" />
-    <setting type="sep" />
-  </category>
+	<category label="General">
+		<setting label="Current Version" id="current_version" type="text" default="1.0.0" visible="false" />
+		<setting label="Auto Update" id="auto_update" type="bool" default="false"/>
+       	<setting label="Nigthly Releases (unstable)" id="nightly_update" type="bool" default="false"/>
+       	<setting label="Update Now" type="action" option="close" action="RunScript(service.boxik.firmware, manual)" />
+	</category>
 </settings>

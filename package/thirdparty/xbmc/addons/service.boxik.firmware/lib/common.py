@@ -20,137 +20,172 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 import urllib2
+import urllib
 import os
 import hashlib
+import download
+import re
+from backup import Backup, Restore
 
+__addon_id__     = 'service.boxik.firmware'
 __addon__        = xbmcaddon.Addon()
 __addonversion__ = __addon__.getAddonInfo('version')
 __addonname__    = __addon__.getAddonInfo('name')
 __addonpath__    = __addon__.getAddonInfo('path').decode('utf-8')
-__icon__         = __addon__.getAddonInfo('icon')
 __localize__     = __addon__.getLocalizedString
+__icon__         = __addon__.getAddonInfo('icon')
 
-__REMOTESERVER__  = "http://mogilia.com/xbmc/update/"
-__INSTALLSDCARD__ = "/media/usb0/"
-__VERSIONFILE__   = "version.ini"
-__VERSIONLOCAL__  = __addonpath__ + "/" + __VERSIONFILE__
-__VERSIONREMOTE__ = __REMOTESERVER__ + __VERSIONFILE__
-__FWEXTENSION__   = ".zip"
+# TODO3: userdata gets wiped on update when user update and poweroff from remote - wierd
+# what to do? backup and restore? 
 
+__SERVERPATH__ = "https://dl.dropboxusercontent.com/u/2180474/boxik/stable/update.ini"
+__SERVERPATHNIGHTLY__ = "https://dl.dropboxusercontent.com/u/2180474/boxik/unstable/nightly.ini"
 
-def log(txt):
-    if isinstance(txt, str):
-        txt = txt.decode("utf-8")
-    message = u'%s: %s' % ("XBMC Version Check", txt)
-    xbmc.log(msg=message.encode("utf-8"), level=xbmc.LOGDEBUG)
-
+def OPEN_URL(url):
+    try:
+        req = urllib2.Request(url)
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        response = urllib2.urlopen(req)
+        link=response.read()
+        response.close()
+        return link
+    except urllib2.HTTPError, e:
+        message('No internect connection')
+        xbmc.log("BOXiK Auto Service: HTTPError %s" % str(e))
+        return False
+    except urllib2.URLError, e:
+        message('No internect connection')
+        xbmc.log("BOXiK Auto Service: URLError %s" % str(e))
+        return False
 
 def message(txt):
     xbmc.executebuiltin("XBMC.Notification(%s, %s, %d, %s)" % (__addonname__, txt, 5000, __icon__))
 
+def setSetting(setting, value):
+    return xbmcaddon.Addon(id = __addon_id__).setSetting(setting, value)
 
-def download_files(files):
-    for file, filename in files.iteritems():
-        url = __REMOTESERVER__ + file
-        u = urllib2.urlopen(url)
-        f = open(__INSTALLSDCARD__ + filename, 'w')
-        meta = u.info()
-        file_size = int(meta.getheaders("Content-Length")[0])
-        #print("Downloading: {0} Bytes: {1}".format(file, file_size))
+def getSetting(setting):
+    return xbmcaddon.Addon(id = __addon_id__).getSetting(setting)
 
-        file_size_dl = 0
-        block_sz = 8192
-        while True:
-            buffer = u.read(block_sz)
-            if not buffer:
-                break
+def set_lock():
+    xbmcgui.Window(10000).setProperty('update.lock', 'true')
+     
+def remove_lock():
+    xbmcgui.Window(10000).clearProperty('update.lock')
 
-            file_size_dl += len(buffer)
-            f.write(buffer)
-            p = float(file_size_dl) / file_size
-            status = r"{0}  [{1:.2%}]".format(file_size_dl, p)
-            status = status + chr(8)*(len(status)+1)
-            #sys.stdout.write(status)
-
-        f.close()
-    return True
-
-
-def check_md5(files):
-    for o_file, md5file in files.iteritems():
-        if md5Checksum(__INSTALLSDCARD__ + o_file) != read_local_file(__INSTALLSDCARD__ + md5file).strip():
-            return False
-    return True
-
-
-def md5Checksum(filePath):
-    with open(filePath, 'rb') as fh:
-        m = hashlib.md5()
-        while True:
-            data = fh.read(8192)
-            if not data:
-                break
-            m.update(data)
-        return m.hexdigest()
-
-
-def download_firmware():
-    try:
-        version = get_remote_version()
-        message('Downloading new firmware [%s]' % version)
-        files = {
-            "factory_update_param.aml": "factory_update_param.aml", 
-            "factory_update_param.md5": "factory_update_param.md5", 
-            "update_1.0.3.zip": "update.zip", 
-            "update_1.0.3.md5": "update.md5"
-        }
-        checks = {
-            "factory_update_param.aml": "factory_update_param.md5", 
-            "update.zip": "update.md5"
-        }
-
-        if download_files(files) and check_md5(checks):
-            if xbmcgui.Dialog().yesno(__addonname__, "Would you like to update now?", "Restart is required"):
-                set_version(version) 
-                os.system('touch /media/usb0/restart_allowed') 
-                ##os.system('reboot recovery')
-        else:
-            message('Download failed, please update manually')
-    except urllib2.HTTPError:  
-        return False
-
-
-def new_update():
-    try:
-        version = get_remote_version()
-        urllib2.urlopen(__REMOTESERVER__ + 'update_' + version + __FWEXTENSION__)
+def is_running():
+    if xbmcgui.Window(10000).getProperty('update.lock') == 'true':
         return True
-    except urllib2.HTTPError:
-        return False
+    return False
 
-
-def manual_update():
-    if xbmcgui.Dialog().yesno(__addonname__, "Do you have the update.zip on SD Card?", "Selecting 'Yes' will reboot your device to start the update."):
-        os.system('/bin/sh /etc/init.d/S95xbmc stop; reboot recovery;')   
-
-
-def set_version(version):
-    f = open(__VERSIONLOCAL__, 'w')
-    f.write(version)
-    f.close()
-
+def set_local_version(version):
+    xbmcgui.Window(10000).setProperty("firmware.version", version)
+    return setSetting('current_version', version)
 
 def get_local_version():
-    return read_local_file(__VERSIONLOCAL__)
+    version = getSetting('current_version')
+    print version
+    xbmcgui.Window(10000).setProperty("firmware.version", version)
+    return version
 
+def remote_path():
+    if (getSetting('nightly_update') == 'true'):
+        return __SERVERPATHNIGHTLY__
 
-def get_remote_version():
-    u = urllib2.urlopen(__VERSIONREMOTE__)
-    version = u.read()  
-    return str(version).strip()
+    return __SERVERPATH__ 
 
+def new_update(silent=False):
+    if not silent:
+        dp = xbmcgui.DialogProgress()
+        dp.create("BOXiK Updater", "Checking for new updates",' ', 'Please Wait...')
+    
+    link = OPEN_URL(remote_path())
+    if link:
+        link = link.replace('\n','').replace('\r','')
+        if not silent:
+            dp.update(70)
+        remote_version, update_url, update_md5  = re.compile('version="(.+?)".+?ile="(.+?)".+?d5="(.+?)"').findall(link)[0]   
+        if not silent:
+            dp.update(100)
+            dp.close()
+        if remote_version != get_local_version():
+            return remote_version, update_url, update_md5
+    
+    return False, False, False
+   
 
-def read_local_file(file):
-    with open(file, 'r') as f:
-        firstline = f.readline()
-        return str(firstline).strip()
+def manual():
+    
+    # backup = Backup('/tmp/')
+    # backup.run()
+    
+    if is_running():
+        message('Updater is running, please wait.')
+        return
+
+    if xbmcgui.Dialog().yesno(__addonname__, "Would you like to do an online update?"):
+        new_version, update_url, update_md5 = new_update()
+        xbmc.log('BOXiK Manual Service: New update check - %s' % new_version)
+        if not new_version:
+            dp = xbmcgui.Dialog()
+            dp.ok(__addonname__, "Your BOXiK version %s is up to date." % get_local_version())
+        else:
+            start(new_version, update_url, update_md5)
+    else:
+        if xbmcgui.Dialog().yesno(__addonname__, "Do you have the update.zip on USB thumb?", "Selecting 'Yes' will reboot your device to start the update."):
+            reboot()
+
+def auto():
+    if is_running():
+        message('Updater is running, please wait.')
+        return
+
+    if getSetting('auto_update') == 'true':
+        new_version, update_url, update_md5 = new_update(True)
+        xbmc.log('BOXiK Auto Service: New update check - %s' % new_version)
+        start(new_version, update_url, update_md5)
+
+def reboot():
+    remove_lock()
+    os.system('/bin/sh /etc/init.d/S95xbmc stop; reboot recovery;')
+   
+def which_usb():
+       # TODO: check USB size?
+    '''
+    import subprocess
+    df = subprocess.Popen(["df"], stdout=subprocess.PIPE)
+    output = df.communicate()[0]
+    device, size, used, available, percent, mountpoint = output.split("\n")[1].split()
+    '''
+    try:
+        root = "/media"
+        mount = [name for name in os.listdir(root) if os.path.isdir(os.path.join(root, name)) and os.access(os.path.join(root, name), os.W_OK and not os.path.exists( os.path.join(root, name) + "/.empty" ))][0]
+        path = "%s/%s/" % (root, mount)
+        xbmc.log("BOXiK Auto Service: setting path %s" % path)
+        return path
+    except IndexError:
+        xbmc.log("BOXiK Auto Service: no path")
+        return False
+    except:
+        xbmc.log("BOXiK Auto Service: bad path")
+        return False
+
+    return False
+    
+
+def start(version, update_url, update_md5):
+    set_lock()
+    if version and xbmcgui.Dialog().yesno(__addonname__, "New update ("+ version +") is available, would you like to update?", "Selecting 'Yes' will download the update, reboot your", "device and start the update process."):
+        download_location = which_usb()
+        if download_location:
+            xbmc.log("BOXiK Auto Service: %s %s %s %s " % (remote_path(), download_location, update_url, update_md5))
+            if download.firmware(download_location, update_url, update_md5):
+                set_local_version(version)
+                reboot()
+            else: 
+                dp = xbmcgui.Dialog()
+                dp.ok(__addonname__, "Download failed", "", "Try again later.")
+        else:
+            dp = xbmcgui.Dialog()
+            dp.ok(__addonname__, "Please insert a compatible USB into the BOXiK", " ", "Update manually from Settings menu > Update")
+    remove_lock()
