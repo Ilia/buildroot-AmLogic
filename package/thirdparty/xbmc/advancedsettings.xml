@@ -1,8 +1,9 @@
 <advancedsettings>
   <enablenetworkmanager>1</enablenetworkmanager>
   <showexitbutton>false</showexitbutton>
+  <fanartres>720</fanartres>
+  <imageres>512</imageres>
   <network>
-    <!-- 104857600B = 100MB x 3 = 300MB max buffer -->
     <cachemembuffersize>104857600</cachemembuffersize>
     <readbufferfactor>4.0</readbufferfactor>
     <alwaysforcebuffer>1</alwaysforcebuffer>
@@ -11,7 +12,6 @@
     <minvideocachelevel>50</minvideocachelevel>
     <minaudiocachelevel>50</minaudiocachelevel>
   </pvr>
-
   <hidesettings>
     <setting>lookandfeel.soundskin</setting>
     <setting>videoplayer.rendermethod</setting>
