@@ -2,10 +2,9 @@
   <enablenetworkmanager>1</enablenetworkmanager>
   <showexitbutton>false</showexitbutton>
   <fanartres>720</fanartres>
-  <imageres>512</imageres>
   <network>
-    <cachemembuffersize>104857600</cachemembuffersize>
-    <readbufferfactor>4.0</readbufferfactor>
+    <cachemembuffersize>52428800</cachemembuffersize>
+    <readbufferfactor>2.0</readbufferfactor>
     <alwaysforcebuffer>1</alwaysforcebuffer>
   </network>
   <pvr>
