@@ -26,7 +26,7 @@ define ROOTFS_RECOVERY_AML_CMD
  find $(BINARIES_DIR)/aml_recovery/system/ -type l -delete && \
  find $(BINARIES_DIR)/aml_recovery/system/ -type d -empty -exec sh -c 'echo "dummy" > "{}"/.empty' \; && \
  pushd $(BINARIES_DIR)/aml_recovery/ >/dev/null && \
- zip -m -q -r -y $(BINARIES_DIR)/aml_recovery/update-unsigned.zip aml_logo.img uImage-2.6.34 META-INF system && \
+ zip -m -q -r -y $(BINARIES_DIR)/aml_recovery/update-unsigned.zip aml_logo.img uImage-2.6.34.14 META-INF system && \
  popd >/dev/null && \
  echo "Signing update.zip..." && \
  pushd fs/recovery_aml/ >/dev/null; java -Xmx1024m -jar signapk.jar -w testkey.x509.pem testkey.pk8 $(BINARIES_DIR)/aml_recovery/update-unsigned.zip $(BINARIES_DIR)/update.zip && \
