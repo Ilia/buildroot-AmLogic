@@ -147,7 +147,7 @@ def auto():
 
 def reboot():
     remove_lock()
-    os.system('/bin/sh /etc/init.d/S95xbmc stop; reboot recovery;')
+    os.system('reboot recovery;')
    
 def which_usb():
        # TODO: check USB size?
