@@ -147,7 +147,7 @@ def auto():
 
 def reboot():
     remove_lock()
-    os.system('reboot recovery;')
+    os.system('reboot recovery')
    
 def which_usb():
        # TODO: check USB size?
@@ -159,7 +159,10 @@ def which_usb():
     '''
     try:
         root = "/media"
-        mount = [name for name in os.listdir(root) if os.path.isdir(os.path.join(root, name)) and os.access(os.path.join(root, name), os.W_OK and not os.path.exists( os.path.join(root, name) + "/.empty" ))][0]
+        mount = [name for name in os.listdir(root) if os.path.isdir(os.path.join(root, name)) and \
+            os.access(os.path.join(root, name), os.W_OK and \
+            name != "EFI" and \
+            not os.path.exists( os.path.join(root, name) + "/.empty" ))][0]
         path = "%s/%s/" % (root, mount)
         xbmc.log("BOXiK Auto Service: setting path %s" % path)
         return path

@@ -11,6 +11,7 @@ def firmware(localpath, remote_url, remote_md5):
 		os.system('echo "--update_package=/udisk/update.zip" > %s/factory_update_param.aml' % localpath)
 		return True
 	else:
+        xbmc.log("BOXiK Auto Service: Failed")
 		return False
 
 def get_file(url, localfile):
@@ -22,7 +23,8 @@ def get_file(url, localfile):
 		dp.close()
 		return True
 	except: 
-		return False
+		xbmc.log("BOXiK Auto Service: Can't start download")
+        return False
 
 def _pbhook(numblocks, blocksize, filesize, dp, start_time):
     if dp.iscanceled(): 
@@ -54,7 +56,8 @@ def _pbhook(numblocks, blocksize, filesize, dp, start_time):
 
 def check_md5(downloaded, remote_md5): 
 	if MD5(downloaded) != remote_md5:
-		return False
+		xbmc.log("BOXiK Auto Service: Bad md5")
+        return False
 	
 	return True
 
