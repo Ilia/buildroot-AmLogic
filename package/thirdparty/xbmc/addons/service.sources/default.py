@@ -31,7 +31,12 @@ class Main:
         if not os.path.exists( xbmc.translatePath('special://home/userdata/sources.xml')):
             shutil.copy2(os.path.dirname(os.path.abspath(__file__)) + '/resources/sources.xml', xbmc.translatePath('special://home/userdata/sources.xml'))
             xbmc.executebuiltin("ReloadSources")
-
+        if not os.path.exists('/root/library/'):
+            os.makedirs('/root/library')		
+            os.makedirs('/root/library/videos')
+            os.makedirs('/root/library/tv')
+            os.makedirs('/root/library/music')
+            os.makedirs('/root/library/pictures')
 if (__name__ == "__main__"):
     Main()
     del Main
