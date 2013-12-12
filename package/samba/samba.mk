@@ -3,7 +3,7 @@
 # samba
 #
 #############################################################
-SAMBA_VERSION = 3.6.22
+SAMBA_VERSION = 3.5.11
 SAMBA_SOURCE = samba-$(SAMBA_VERSION).tar.gz
 SAMBA_SITE = http://ftp.samba.org/pub/samba/stable/
 
