@@ -5,17 +5,29 @@
     <video>
         <default pathversion="1"></default>
         <source>
-            <name>Local</name>
-            <path pathversion="1">/root/.xbmc/userdata/library/</path>
+            <name>Library</name>
+            <path pathversion="1">/root/library/</path>
         </source>
     </video>
     <music>
         <default pathversion="1"></default>
+	 <source>
+            <name>Library</name>
+            <path pathversion="1">/root/library/</path>
+        </source>
     </music>
     <pictures>
         <default pathversion="1"></default>
+	<source>
+            <name>Library</name>
+            <path pathversion="1">/root/library/</path>
+        </source>
     </pictures>
     <files>
         <default pathversion="1"></default>
+	<source>
+            <name>Library</name>
+            <path pathversion="1">/root/library/</path>
+        </source>    
     </files>
 </sources>
