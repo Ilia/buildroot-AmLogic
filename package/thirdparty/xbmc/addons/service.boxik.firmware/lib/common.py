@@ -78,13 +78,17 @@ def is_running():
         return True
     return False
 
-def set_local_version(version):
-    xbmcgui.Window(10000).setProperty("firmware.version", version)
-    return setSetting('current_version', version)
+
 
 def get_local_version():
-    version = getSetting('current_version')
-    print version
+    try:
+        f = open('/usr/share/xbmc/system/version', 'r')
+        version = f.readline()
+    except IOError:
+        version = getSetting('current_version')
+    
+    xbmc.log('BOXiK Manual Service: Local version = %s' % version)
+
     xbmcgui.Window(10000).setProperty("firmware.version", version)
     return version
 
@@ -183,7 +187,6 @@ def start(version, update_url, update_md5):
         if download_location:
             xbmc.log("BOXiK Auto Service: %s %s %s %s " % (remote_path(), download_location, update_url, update_md5))
             if download.firmware(download_location, update_url, update_md5):
-                set_local_version(version)
                 reboot()
             else: 
                 dp = xbmcgui.Dialog()
