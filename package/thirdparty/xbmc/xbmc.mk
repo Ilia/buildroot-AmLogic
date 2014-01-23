@@ -60,6 +60,7 @@ define XBMC_INSTALL_ETC
   cp -f package/thirdparty/xbmc/nobs.xml $(TARGET_DIR)/usr/share/xbmc/system/keymaps/
   cp -f package/thirdparty/xbmc/keyboard2.xml $(TARGET_DIR)/usr/share/xbmc/system/keymaps/
   cp -f package/thirdparty/xbmc/peripherals.xml $(TARGET_DIR)/usr/share/xbmc/system/
+  cp -f package/thirdparty/xbmc/version $(TARGET_DIR)/usr/share/xbmc/system/
 endef
 
 define XBMC_INSTALL_REMOTE_CONF
